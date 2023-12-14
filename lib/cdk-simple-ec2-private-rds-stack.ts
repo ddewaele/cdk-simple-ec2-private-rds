@@ -2,7 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as rds from 'aws-cdk-lib/aws-rds';
-import { MachineImage } from 'aws-cdk-lib/aws-ec2';
+import { MachineImage, UserData } from 'aws-cdk-lib/aws-ec2';
 
 export class CdkSimpleEc2PrivateRdsStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -33,10 +33,20 @@ export class CdkSimpleEc2PrivateRdsStack extends cdk.Stack {
     ec2Sg.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(22));
 
 
+    const userData = UserData.forLinux();
+
+    userData.addCommands(
+    'yum update -y',
+    'dnf update -y',
+    'dnf install postgresql15.x86_64 -y',
+  );  
+
+
     // Create an EC2 instance
     const ec2Instance = new ec2.Instance(this, 'MyEc2Instance', {
       instanceType: new ec2.InstanceType('t3.micro'),
       machineImage: MachineImage.latestAmazonLinux2023(),
+      userData: userData,
       vpc,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PUBLIC,
@@ -115,6 +125,19 @@ export class CdkSimpleEc2PrivateRdsStack extends cdk.Stack {
       value: rdsSg.securityGroupId,
       description: 'The ID of the RDS instance security group',
     });
+
+    if (rdsInstance.secret) {
+      new cdk.CfnOutput(this, 'RDSSecretArn', {
+        value: rdsInstance.secret.secretArn,
+        description: 'ARN of the secret containing the RDS instance credentials',
+      });
+    
+      new cdk.CfnOutput(this, 'RDSSecretName', {
+        value: rdsInstance.secret.secretName,
+        description: 'Name of the secret containing the RDS instance credentials',
+      });
+    }
+    
 
   }
 }
