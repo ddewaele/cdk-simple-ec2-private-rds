@@ -1,8 +1,29 @@
-# Welcome to your CDK TypeScript project
+# AWS CDK TypeScript Project: VPC, EC2, and RDS Setup
 
-This is a blank project for CDK development with TypeScript.
+## Overview
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+This project is an AWS Cloud Development Kit (CDK) application that provisions 
+
+- a VPC
+- an EC2 instance
+- RDS PostgreSQL database. 
+
+![](./docs/ec2-rds.png)
+
+The infrastructure includes a VPC with public and private subnets across two Availability Zones
+
+- an EC2 instance within a public subnet
+- an RDS instance within a private subnet.
+
+
+After deployment, the CDK will output the relevant information such as EC2 public IP, RDS endpoint, etc.
+
+## Resources Created
+
+- **Amazon VPC**: A virtual private cloud with public and private subnets.
+- **EC2 Instance**: An Amazon EC2 instance within the public subnet.
+- **RDS Instance**: An Amazon RDS PostgreSQL instance within a private subnet.
+- **Security Groups**: Separate security groups for EC2 and RDS instances with minimal access rules.
 
 ## Useful commands
 
